@@ -1,7 +1,8 @@
 "use strict";
 var HClass = require('../base/HClass');
+var tplEngine = require('./tplEngine');
 
-var valREG = /{{(.+?)}}/gi;
+
 
 var GV = HClass.extend({
     $id:null,
@@ -16,22 +17,13 @@ var GV = HClass.extend({
         this.compileDom();
         this.compileData(this.$data);
         this.render();
+
     },
     compileDom:function(){
         var id = this.$id;
         var dom = this.$dom = document.getElementById(id);
         var innerHtml = dom.innerHTML;
-        var arr = valREG.exec(innerHtml);
-        var tpl = 'return ',lastIndex=0;
-        for(;arr;arr = valREG.exec(innerHtml)){
-            console.log(arr);
-            var preStr = innerHtml.substring(lastIndex,arr.index);
-            lastIndex = valREG.lastIndex;
-            tpl+='\''+preStr.replace(/\'/g,'\\\'')+'\''+'+data.'+arr[1]+'+';
-        }
-        var afterStr = innerHtml.substring(lastIndex);
-        tpl+='\''+afterStr.replace(/\'/g,'\\\'')+'\'';
-        this.$tpl = new Function('data',tpl.replace(/\n/g,''));
+        this.$tpl = tplEngine.compileDom(id,innerHtml);
     },
 
     _compileObj:function(obj,key,defaultVal){
@@ -72,7 +64,7 @@ var GV = HClass.extend({
         });
     },
     render:function(){
-        console.log(this.$data);
+//        console.log(this.$data);
         var html = this.$tpl(this.$data);
         this.$dom.innerHTML = html;
     }
