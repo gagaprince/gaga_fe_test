@@ -8,6 +8,7 @@ var GV = HClass.extend({
     $dom:null,
     $data:null,
     $tpl:null,
+    _renderlock:null,
 
     ctor:function(options){
         this.$id = options&&options.el;
@@ -44,7 +45,7 @@ var GV = HClass.extend({
                 if(typeof name=="object"){
                     _this.compileData(name);
                 }
-                _this.render();
+                _this.postRender();
             },
             get: function() {
                 return val;
@@ -59,6 +60,16 @@ var GV = HClass.extend({
             }
             this._compileObj(data,key,data[key]);
         }
+    },
+    postRender:function(){
+        if(this._renderlock){
+            clearTimeout(this._renderlock);
+            this._renderlock = null;
+        }
+        var _this = this;
+        this._renderlock = setTimeout(function(){
+            _this.render();
+        });
     },
     render:function(){
         console.log(this.$data);
