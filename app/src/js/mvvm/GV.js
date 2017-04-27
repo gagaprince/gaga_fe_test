@@ -17,7 +17,7 @@ var GV = HClass.extend({
         this.compileDom();
         this.compileData(this.$data);
         this.render();
-
+        tplEngine.compileTpl(this.$id,this.$data);
     },
     compileDom:function(){
         var id = this.$id;

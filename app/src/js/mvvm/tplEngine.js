@@ -1,5 +1,6 @@
 "use strict";
-var TreeNode = require('./TreeNode');
+var TplTreeNode = require('./tree/TplTreeNode');
+var vDomNode = require('./tree/vDomNode');
 
 
 var valREG = /{{(.+?)}}/gi;
@@ -13,7 +14,6 @@ var tplEngine = {
     compileDom:function(id,innerHtml){
         innerHtml = innerHtml.replace(/\n/g,'');
         tplCache[id]=innerHtml; //将模板加入tpl缓存 之后要根据tpl 生成虚拟dom
-        this.compileTpl(id);
         var arr = valREG.exec(innerHtml);
         var tpl = 'return ',lastIndex=0;
         for(;arr;arr = valREG.exec(innerHtml)){
@@ -26,24 +26,27 @@ var tplEngine = {
         tpl+='\''+afterStr.replace(/\'/g,'\\\'')+'\'';
         return new Function('data',tpl);
     },
-    compileTpl:function(id){
+    compileTpl:function(id,data){
         var tpl = tplCache[id];
-        console.log(tpl);
-        var root = new TreeNode("root");
+//        console.log(tpl);
+        var root = new TplTreeNode("root");
         this.treeCompile(tpl,root);
-        console.log(root);
+//        console.log(root);
+        var vDomRoot = new vDomNode("vdomRoot");
+        root.parseVdomByDirective(data,vDomRoot);
+        console.log(vDomRoot);
     },
     treeCompile:function(tpl,node){
-        console.log("treeCompile");
-        console.log(tpl);
+//        console.log("treeCompile");
+//        console.log(tpl);
         var arr = this.childCompile(tpl);
         if(arr){
             if(arr[3].indexOf('<')!=-1){
                 this.resetChildREG();
                 //说明应该使用Parent方式
                 arr = this.parentCompile(tpl);
-                console.log("parent");
-                console.log(arr);
+//                console.log("parent");
+//                console.log(arr);
                 if(arr){
                     var nodeChild =this.createTreeNodeByArr(arr);
                     node.addChild(nodeChild);
@@ -51,8 +54,8 @@ var tplEngine = {
                 }
             }else{
                 for(;arr;arr=this.childCompile(tpl)){
-                    console.log("child");
-                    console.log(arr);
+//                    console.log("child");
+//                    console.log(arr);
                     var nodeChild =this.createTreeNodeByArr(arr);
                     node.addChild(nodeChild);
                 }
@@ -68,7 +71,7 @@ var tplEngine = {
     },
     createTreeNodeByArr:function(arr){
         if(arr){
-            var nodeChild = new TreeNode();
+            var nodeChild = new TplTreeNode();
             var tagName = arr[1];//标签名
             var attrKey = this.anysisKey(arr[2]);
             nodeChild.setKey(tagName+attrKey);
@@ -87,7 +90,6 @@ var tplEngine = {
                 keyMap[keyValue[0]]=keyValue[1];
             }
         }
-        console.log(keyMap);
         var returnKey = "";
         if("id" in keyMap){
             returnKey+='#'+keyMap["id"];
