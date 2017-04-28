@@ -66,6 +66,7 @@ var GV = HClass.extend({
     render:function(){
 //        console.log(this.$data);
         var html = this.$tpl(this.$data);
+        
         this.$dom.innerHTML = html;
     }
 
