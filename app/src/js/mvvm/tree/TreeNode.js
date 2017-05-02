@@ -34,6 +34,9 @@ var TreeNode = HClass.extend({
         return this.children;
     },
     setDomText:function(text){
+        if(text.indexOf('<')==-1){
+            this.text = text;
+        }
         this.domText = text;
     },
     getDomText:function(){

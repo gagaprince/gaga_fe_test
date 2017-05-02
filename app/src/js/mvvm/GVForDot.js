@@ -1,6 +1,7 @@
 "use strict";
 var HClass = require('../base/HClass');
 var doT = require('../../../../bower_components/doT/doT.js');
+var DiffEngine = require('./vDomDiff/DiffEngine');
 
 
 
@@ -10,14 +11,16 @@ var GV = HClass.extend({
     $data:null,
     $tpl:null,
     _renderlock:null,
+    diffEngine:null,
+    currentRenderTree:null,
 
     ctor:function(options){
         this.$id = options&&options.el;
         this.$data = options&&options.data&&options.data()||{};
+        this.diffEngine = new DiffEngine();
         this.compileDom();
         this.compileData(this.$data);
         this.render();
-        console.log(doT);
     },
     compileDom:function(){
         var id = this.$id;
@@ -66,8 +69,21 @@ var GV = HClass.extend({
     render:function(){
 //        console.log(this.$data);
         var html = this.$tpl(this.$data);
-        
-        this.$dom.innerHTML = html;
+        console.log(html);
+        var vDomRoot = this.diffEngine.parseHtmlToVDom(html);
+        if(this.currentRenderTree){
+            console.log(this.currentRenderTree);
+            console.log(vDomRoot);
+            this.diffEngine.diffTree(this.currentRenderTree,vDomRoot);
+            console.log(this.currentRenderTree);
+            console.log(vDomRoot);
+        }else{
+            this.currentRenderTree = vDomRoot;
+            vDomRoot.setDom(this.$dom);
+            this.$dom.innerHTML = '';
+            this.diffEngine.renderNormalTree(vDomRoot);
+        }
+//        this.$dom.innerHTML = html;
     }
 
 });

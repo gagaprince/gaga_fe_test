@@ -13,10 +13,18 @@
         <div id="test">
 
             <div class="stdmsg">
-                <div id="name" class="name">姓名:{{=it.name}}</div>
+                <div id="name"    class="name">姓名:{{=it.name}}</div>
                 <div id="sex" class="sex">性别:{{=it.sex}}</div>
+                嘿嘿和
                 <div id="mumName" class="mum-name">妈妈名字:{{=it.mum.name}}</div>
                 <div id="mumSex" class="mum-sex">妈妈性别:{{=it.mum.sex}}</div>
+                哈哈哈
+                <div class="children">
+                    {{~it.children:child:index}}
+                    <div id="childName_{{=index}}" class="mum-name">child名字:{{=child.name}}</div>
+                    <div id="mumSex_{{=index}}" class="mum-sex">child性别:{{=child.sex}}</div>
+                    {{~}}
+                </div>
             </div>
         </div>
     </body>
