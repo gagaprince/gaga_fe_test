@@ -13,6 +13,9 @@ var TreeNode = HClass.extend({
     setKey:function(key){
         this.key = key;
     },
+    getParent:function(){
+        return this.parent;
+    },
     addParent:function(parent){
         this.parent = parent;
     },
