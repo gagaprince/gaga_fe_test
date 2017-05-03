@@ -28,4 +28,7 @@ $(function(){
             sex:"girl"
         });
     },2000);
+    setTimeout(function(){
+        _gv.$data.children.shift();
+    },4000);
 })

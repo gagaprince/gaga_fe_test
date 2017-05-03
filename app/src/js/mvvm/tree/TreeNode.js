@@ -44,6 +44,19 @@ var TreeNode = HClass.extend({
     },
     getDomText:function(){
         return this.domText;
+    },
+    removeFromParent:function(){
+        var p = this.getParent();
+        if(p){
+            var cdr = p.getChildren();
+            var child = cdr[0];
+            for(var i=0;child;child=cdr[++i]){
+                if(child==this){
+                    cdr.splice(i,1);
+                    break;
+                }
+            }
+        }
     }
 });
 module.exports = TreeNode;

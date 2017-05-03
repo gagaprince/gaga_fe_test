@@ -77,12 +77,15 @@ var GV = HClass.extend({
             this.diffEngine.diffTree(this.currentRenderTree,vDomRoot);
             console.log(this.currentRenderTree);
             console.log(vDomRoot);
+            this.diffEngine.renderDiffTree(vDomRoot);
+//            this.currentRenderTree
         }else{
-            this.currentRenderTree = vDomRoot;
+
             vDomRoot.setDom(this.$dom);
             this.$dom.innerHTML = '';
             this.diffEngine.renderNormalTree(vDomRoot);
         }
+        this.currentRenderTree = vDomRoot;
 //        this.$dom.innerHTML = html;
     }
 

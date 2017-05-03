@@ -23,12 +23,22 @@ var vDomNode = TreeNode.extend({
     setAttrMap:function(attrMap){
         this.attrMap = attrMap||{};
     },
+    getAttrMap:function(){
+        return this.attrMap;
+    },
     setTagName:function(tagName){
         this.tagName = tagName;
+    },
+    getDiffNode:function(){
+        return this.diffNode;
     },
     addFlag:function(flag,oldNode){
         this.diffFlag = flag;
         this.diffNode = oldNode;
+    },
+    resetFlag:function(){
+        this.diffFlag = "";
+        this.diffNode = null;
     },
     setDom:function(dom){
         //和自己当前节点相匹配的真实dom节点

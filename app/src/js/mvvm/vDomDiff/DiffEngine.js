@@ -91,6 +91,7 @@ var DiffEngine = HClass.extend({
             if(oldChild){
                 this.diffTree(oldChild,newChild);
                 newChild.addFlag("modify",oldChild);
+                newChild.setDom(oldChild.getDom());
                 oldChild.addFlag("modifyOld");
             }else{
                 //同名老节点不存在 直接添加新节点 其所有子节点都需要添加
@@ -102,11 +103,78 @@ var DiffEngine = HClass.extend({
             var flag = oldChild.diffFlag;
             if(flag!="modifyOld"){
                 oldChild.addFlag("del");
+                newTreeNode.addChild(oldChild);
             }
         }
+    },
+    renderDiffTree:function(newTreeNode){
+        var diffFlag = newTreeNode.diffFlag;
+//        console.log(diffFlag);
+        if(diffFlag=="modify"){
+            //需要diff old 和 new 来确认修改
+            var oldNode = newTreeNode.getDiffNode();
+            this.renderModifyNode(newTreeNode,oldNode);
+        }else if(diffFlag == "add"){
+            //需要添加整个分支 递归添加就可以
+            var domP = newTreeNode.getParent().getDom();
+            this.renderNormalTree(newTreeNode,domP);
 
+        }else if(diffFlag=="del"){
+            //删除当前节点 并且从虚拟dom上删除
+            var domP = newTreeNode.getParent().getDom();
+            var domC = newTreeNode.getDom();
+            console.log(domP);
+            console.log(domC);
+            domP.removeChild(domC);
+            newTreeNode.removeFromParent();
+            return true;//代表remove了
+        }
 
+        newTreeNode.resetFlag();
+        var children = newTreeNode.getChildren()||[];
+        var child = children[0];
+        for(var i=0;child;child=children[++i]){
+            var isRemove = this.renderDiffTree(child);
+            if(isRemove){
+                i--;
+            }
+        }
+    },
+    renderModifyNode:function(newNode,oldNode){
+        var dom = newNode.getDom();
+        console.log("renderModifyNode begin");
+        console.log(newNode,oldNode);
+        console.log("renderModifyNode end");
 
+        this._renderModifyAttr(newNode,oldNode,dom);
+        this._renderModifyText(newNode,oldNode,dom);
+    },
+    _renderModifyAttr:function(newNode,oldNode,dom){
+        var attrNew = newNode.getAttrMap();
+        var attrOld = oldNode.getAttrMap();
+        for(var key in attrNew){
+            if(key in attrOld){
+                if(attrNew[key]!=attrOld[key]){
+                    dom.setAttribute(key,attrNew[key]);
+                    delete attrOld[key];
+                }
+            }else{
+                dom.setAttribute(key,attrNew[key]);
+            }
+        }
+        for(var key in attrOld){
+            dom.removeAttribute(key);
+        }
+    },
+    _renderModifyText:function(newNode,oldNode,dom){
+        console.log("_renderModifyText");
+        console.log(newNode.text);
+        console.log(oldNode.text);
+        console.log(dom);
+        console.log("_renderModifyText end");
+        if(newNode.text!=oldNode.text){
+            dom.data = newNode.text;
+        }
     },
     _parseKeyMapFromNodeList:function(children){
         if(children){
@@ -147,6 +215,7 @@ var DiffEngine = HClass.extend({
             }
             domP.appendChild(ele);
             domP = ele;
+            vDomNode.setDom(domP);
         }
         if(domP){
             var children = vDomNode.getChildren()||[];
