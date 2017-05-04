@@ -10,12 +10,14 @@ var DiffEngine = HClass.extend({
         return root;
     },
     treeCompile:function(tpl,node){
-        var beginTagReg = /<\/?\s*(div|span|p)(.*?)>/gi;
+        var htmlTagReg = /<(.*?)>/gi;
         var beginTagInfos = [];
         var lastTagArr = null;
-        var arr = beginTagReg.exec(tpl);
+        var arr = htmlTagReg.exec(tpl);
+
         var currentNode = node;
-        for(;arr;arr = beginTagReg.exec(tpl)){
+        for(;arr;arr = htmlTagReg.exec(tpl)){
+
             if(lastTagArr){
                 var lastIndex=lastTagArr.lastIndex;
                 var currentHeaderIndex = arr.index;
@@ -25,24 +27,41 @@ var DiffEngine = HClass.extend({
                     currentNode.addChild(child);
                 }
             }
-
-
             var tagHtml = arr[0];
-            var endTagReg = /<\s*\/(.*?)>/gi;
-            var endArr = endTagReg.exec(tagHtml);
-            if(endArr){
-//                console.log("这是一个endTag");
-//                console.log(endArr);
-                  currentNode = currentNode.getParent();
-            }else{
-                var node = this.createTreeNodeByArr(arr);
+            var beginTagReg = /<\s*([a-z]{1,})\s+(.*?)>|<\s*([a-z]{1,})(\s*)>/gi;
+            var beginArr = beginTagReg.exec(tagHtml);
+            if(beginArr){
+                /*console.log("这是一个beginTag");
+                console.log(beginArr);*/
+                var beginRealArr = [];
+                beginRealArr.push(beginArr[0]);
+                if(beginArr[1]){
+                    beginRealArr.push(beginArr[1]);
+                    beginRealArr.push(beginArr[2]);
+                }else{
+                    beginRealArr.push(beginArr[3]);
+                    beginRealArr.push(beginArr[4]);
+                }
+                var node = this.createTreeNodeByArr(beginRealArr);
                 currentNode.addChild(node);
-                currentNode = node;
-                beginTagInfos.push(arr);
-
+                if(beginRealArr[1].match(/\s*(img)\s*/gi)){//要将所有的空标签 在这里罗列
+                    //是一个空标签 比如 img
+                }else{
+                    currentNode = node;
+                    beginTagInfos.push(arr);
+                }
+            }else{
+                var endTagReg = /<\s*\/(.*?)>/gi;
+                var endArr = endTagReg.exec(tagHtml);
+                if(endArr){
+                    /*console.log("这是一个endTag");
+                    console.log(endArr);*/
+                    currentNode = currentNode.getParent();
+                }
             }
+
             lastTagArr = arr;
-            lastTagArr.lastIndex = beginTagReg.lastIndex;
+            lastTagArr.lastIndex = htmlTagReg.lastIndex;
         }
     },
     createTreeNodeByArr:function(arr){
@@ -142,10 +161,6 @@ var DiffEngine = HClass.extend({
     },
     renderModifyNode:function(newNode,oldNode){
         var dom = newNode.getDom();
-        console.log("renderModifyNode begin");
-        console.log(newNode,oldNode);
-        console.log("renderModifyNode end");
-
         this._renderModifyAttr(newNode,oldNode,dom);
         this._renderModifyText(newNode,oldNode,dom);
     },
@@ -156,8 +171,8 @@ var DiffEngine = HClass.extend({
             if(key in attrOld){
                 if(attrNew[key]!=attrOld[key]){
                     dom.setAttribute(key,attrNew[key]);
-                    delete attrOld[key];
                 }
+                delete attrOld[key];
             }else{
                 dom.setAttribute(key,attrNew[key]);
             }
@@ -167,11 +182,6 @@ var DiffEngine = HClass.extend({
         }
     },
     _renderModifyText:function(newNode,oldNode,dom){
-        console.log("_renderModifyText");
-        console.log(newNode.text);
-        console.log(oldNode.text);
-        console.log(dom);
-        console.log("_renderModifyText end");
         if(newNode.text!=oldNode.text){
             dom.data = newNode.text;
         }
