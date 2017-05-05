@@ -3,9 +3,7 @@ var HClass = require('../base/HClass');
 var doT = require('../../../../bower_components/doT/doT.js');
 var DiffEngine = require('./vDomDiff/DiffEngine');
 
-
-
-var GV = HClass.extend({
+var GV = window.GV = HClass.extend({
     $id:null,
     $dom:null,
     $data:null,
