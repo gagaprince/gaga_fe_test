@@ -108,21 +108,28 @@ var DiffEngine = HClass.extend({
             var key = newChild.key;
             var oldChild = oldChildKeyMap[key].pop();
             if(oldChild){
-                this.diffTree(oldChild,newChild);
-                newChild.addFlag("modify",oldChild);
+//                newChild.addFlag("modify",oldChild);
                 newChild.setDom(oldChild.getDom());
+                this.renderModifyNode(newChild,oldChild);
                 oldChild.addFlag("modifyOld");
+                this.diffTree(oldChild,newChild);
             }else{
                 //同名老节点不存在 直接添加新节点 其所有子节点都需要添加
-                newChild.addFlag("add");
+//                newChild.addFlag("add");
+                var domP = newChild.getParent().getDom();
+                this.renderNormalTree(newChild,domP);
             }
         }
         var oldChild = oldChildren[0];
         for(var i=0;oldChild;oldChild=oldChildren[++i]){
             var flag = oldChild.diffFlag;
             if(flag!="modifyOld"){
-                oldChild.addFlag("del");
-                newTreeNode.addChild(oldChild);
+                var domP = oldChild.getParent().getDom();
+                var domC = oldChild.getDom();
+                domP.removeChild(domC);
+//                newTreeNode.removeFromParent();
+//                oldChild.addFlag("del");
+//                newTreeNode.addChild(oldChild);
             }
         }
     },

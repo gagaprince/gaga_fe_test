@@ -77,7 +77,7 @@ var GV = HClass.extend({
             this.diffEngine.diffTree(this.currentRenderTree,vDomRoot);
             console.log(this.currentRenderTree);
             console.log(vDomRoot);
-            this.diffEngine.renderDiffTree(vDomRoot);
+//            this.diffEngine.renderDiffTree(vDomRoot);
 //            this.currentRenderTree
         }else{
 
