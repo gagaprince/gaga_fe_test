@@ -1,15 +1,21 @@
 "use strict";
 var HClass = require('../../base/HClass');
-var baseDirective = HClass.extend({
-    excute:function(tplNode,scorp,vDom){
-        //tplNode是模板引擎树
-        //vdom 是 根据模板引擎 生成的 虚拟dom
-        //挂载在虚拟dom上的数据
-
+var BaseDirective = HClass.extend({
+    express:"",
+    excute:function(tplNode,vDom){
+        //tplNode是模板树节点 vD
+        //vdom 是 上层虚拟节点
     },
-    compileObj:function(express,obj){
-        var fun = new Function("data","return data."+express);
-        return fun(obj);
+    initWithExpress:function(ex){
+        this.express = ex;
     }
 });
-module.exports = baseDirective;
+BaseDirective.createDirByExpress = function(ex){
+    var dir = new this();
+    dir.initWithExpress(ex);
+    return dir;
+}
+BaseDirective.getName = function(ex){
+    return "base";
+}
+module.exports = BaseDirective;

@@ -1,10 +1,9 @@
 "use strict";
-var HClass = require('../base/HClass');
+var GVBase = require('./GVBase');
 var tplEngine = require('./engine/tplEngine');
 
 
-
-var GV = HClass.extend({
+var GV = GVBase.extend({
     $id:null,
     $dom:null,
     $data:null,
@@ -20,8 +19,6 @@ var GV = HClass.extend({
         this.$data = options&&options.data&&options.data()||{};
         //根据id获取模板内容 再根据模板内容分析出模板树
         this.compileTplById();
-
-
 
         /*this.compileDom();
         this.compileData(this.$data);
@@ -92,4 +89,6 @@ var GV = HClass.extend({
     }
 
 });
+
+
 module.exports = GV;
