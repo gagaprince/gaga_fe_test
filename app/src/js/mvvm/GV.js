@@ -1,6 +1,6 @@
 "use strict";
 var HClass = require('../base/HClass');
-var tplEngine = require('./tplEngine');
+var tplEngine = require('./engine/tplEngine');
 
 
 
@@ -8,17 +8,39 @@ var GV = HClass.extend({
     $id:null,
     $dom:null,
     $data:null,
+    $tplTree:null,
+
+
+
     $tpl:null,
     _renderlock:null,
 
     ctor:function(options){
         this.$id = options&&options.el;
         this.$data = options&&options.data&&options.data()||{};
-        this.compileDom();
+        //根据id获取模板内容 再根据模板内容分析出模板树
+        this.compileTplById();
+
+
+
+        /*this.compileDom();
         this.compileData(this.$data);
         this.render();
-        tplEngine.compileTpl(this.$id,this.$data);
+        tplEngine.compileTpl(this.$id,this.$data);*/
     },
+    compileTplById:function(){
+        var id = this.$id;
+        var dom = this.$dom = document.getElementById(id);
+        var innerHtml = dom.innerHTML;
+        this.compileDomByTemplate(innerHtml);
+    },
+    compileDomByTemplate:function(template){
+        this.$tplTree = tplEngine.compileTpl(template);//通过模板引擎 分析出模板树
+    },
+
+
+
+
     compileDom:function(){
         var id = this.$id;
         var dom = this.$dom = document.getElementById(id);
