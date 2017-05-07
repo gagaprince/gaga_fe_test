@@ -2,14 +2,13 @@
 var GVBase = require('./GVBase');
 var tplEngine = require('./engine/tplEngine');
 
-
+GVBase.initDirective();
 var GV = GVBase.extend({
     $id:null,
     $dom:null,
     $data:null,
     $tplTree:null,
-
-
+    $vDomTree:null,
 
     $tpl:null,
     _renderlock:null,
@@ -30,11 +29,17 @@ var GV = GVBase.extend({
         var dom = this.$dom = document.getElementById(id);
         var innerHtml = dom.innerHTML;
         this.compileDomByTemplate(innerHtml);
+        this.compileVDomByTplTree();
     },
     compileDomByTemplate:function(template){
         this.$tplTree = tplEngine.compileTpl(template);//通过模板引擎 分析出模板树
+        console.log(this.$tplTree);
     },
 
+    compileVDomByTplTree:function(){
+        this.$vDomTree = tplEngine.parseVDom(this.$tplTree,this.$data);
+        console.log(this.$vDomTree);
+    },
 
 
 

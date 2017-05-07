@@ -8,6 +8,15 @@ var BaseDirective = HClass.extend({
     },
     initWithExpress:function(ex){
         this.express = ex;
+    },
+    replaceWith:function(scope, exp) {
+        exp = " " + exp.trim();
+        var quickRegex = /([\s\\+\-\\*\/\%\&\|\^!\*~]\s*?)([a-zA-Z_$][a-zA-Z_$0-9]*?)/g;
+        exp = exp.replace(quickRegex, function(a, b, c) {
+            return b + 'scope.' + c;
+        });
+        var func = new Function("scope", "return " + exp);
+        return func(scope);
     }
 });
 BaseDirective.createDirByExpress = function(ex){

@@ -14,19 +14,13 @@ var InsertDirective = BaseDirective.extend({
             var pre = inner.substring(lastIndex,currentIndex);
             var insertExpText = this.replaceWith(scope,express);
             inserText += pre+insertExpText;
+            lastIndex = inserReg.lastIndex;
         }
         var end = inner.substring(lastIndex);
         inserText += end;
+        console.log(inserText);
         //构造出虚拟节点 挂载在vDom上
-    },
-    replaceWith:function(scope, exp) {
-        exp = " " + exp.trim();
-        let quickRegex = /([\s\\+\-\\*\/\%\&\|\^!\*~]\s*?)([a-zA-Z_$][a-zA-Z_$0-9]*?)/g;
-        exp = exp.replace(quickRegex, (a, b, c) => {
-            return b + 'scope.' + c;
-        });
-        var func = new Function("scope", "return " + exp);
-        return func(scope);
+        vDom.setDomText(inserText);
     }
 });
 InsertDirective.getName = function(){

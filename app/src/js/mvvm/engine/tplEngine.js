@@ -4,10 +4,11 @@
  * @type {TplTreeNode|exports}
  */
 var TplTreeNode = require('./../tree/TplTreeNode');
+var vDomNode = require('./../tree/vDomNode');
 
 var tplEngine = {
     compileTpl:function(template){
-
+        return this.parseHtmlToTplTreeNode(template);
     },
     parseHtmlToTplTreeNode:function(template){
         var root = new TplTreeNode('tplRoot');
@@ -67,6 +68,7 @@ var tplEngine = {
             var textNode = new TplTreeNode();
             textNode.setTagName('G_text');
             textNode.setInner(inHtml);
+            textNode.parseDirective();
             return textNode;
         }
         return null;
@@ -74,8 +76,8 @@ var tplEngine = {
     createTplTreeNodeByArr:function(matchArr){
         if(matchArr){
             var tplNode = new TplTreeNode();
-            var tagName = arr[1];//标签名
-            var attrMap = this.anysisAttrMap(arr[2]);
+            var tagName = matchArr[1];//标签名
+            var attrMap = this.anysisAttrMap(matchArr[2]);
             tplNode.setTagName(tagName);
             tplNode.setAttrMap(attrMap);
             tplNode.parseDirective();
@@ -100,7 +102,35 @@ var tplEngine = {
      * @param data
      */
     parseVDom:function(root,data){
-
-    }
+        root.setScope(data);
+        var vDomRoot = new vDomNode('vDomRoot');
+        this.createVdomTreeByTpl(vDomRoot,root);
+        return vDomRoot
+    },
+    createVdomTreeByTpl:function(vDomParent,tplNodeParent){
+        var vDom = this.parseVdomByCurrentNode(vDomParent,tplNodeParent);
+        var children = tplNodeParent.getChildren();
+        var child = children[0];
+        for(var i=0;child;child=children[++i]){
+            child.setScope(tplNodeParent.getScope());
+            this.createVdomTreeByTpl(vDom,child);
+        }
+    },
+    parseVdomByCurrentNode:function(vDomParent,tplNodeParent){
+        var vDom=this.createProVdom();
+        var dirs = tplNodeParent.directives||[];
+        for(var i=0;i<dirs.length;i++){
+            var dir = dirs[i];
+            if(dir)
+            {
+                dir.excute(tplNodeParent,vDom);
+            }
+        }
+        vDomParent.addChild(vDom);
+        return vDom;
+    },
+    createProVdom:function(){
+        return new vDomNode();
+    },
 };
 module.exports = tplEngine;

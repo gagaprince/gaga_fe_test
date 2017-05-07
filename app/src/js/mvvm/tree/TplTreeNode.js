@@ -1,16 +1,19 @@
 "use strict";
 var TreeNode = require('./TreeNode');
 var DirectiveMapUtil = require('../directives/DirectiveMap');
-var vDomNode = require('./vDomNode');
+
 
 var TplTreeNode = TreeNode.extend({
     directives:null,//指令数组
 
-    scorp:null,//数据空间
+    scope:null,//数据空间
 
     tagName:"",//记录标签类型 div等
     attrMap:"",//记录attr对象
     innerText:"",//标签内文本
+
+    proVdom:null,
+
 
 
     setTagName:function(tagName){
@@ -30,7 +33,7 @@ var TplTreeNode = TreeNode.extend({
         //分析attrMap将指令实例化
         var attrMap = this.attrMap;
         var dirMap = DirectiveMapUtil.getMap();
-        var directives = this.directives;
+        var directives = [];
         if(attrMap){
             for(var key in attrMap){
                 var dirReg = /g-(.*?)/gi;
@@ -39,7 +42,8 @@ var TplTreeNode = TreeNode.extend({
                     var dirKey = matchArr[1];
                     var directiveClass = dirMap[dirKey];
                     if(directiveClass){
-                        var directive = directiveClass.createDirByExpress(attrMap[key]);
+                        var directive = new directiveClass();
+                        directive.initWithExpress(attrMap[key]);
                         directives.push(directive);
                     }
                 }
@@ -48,21 +52,27 @@ var TplTreeNode = TreeNode.extend({
         //分析inner 将指令实例化
         if(this.innerText){
             var directiveClass = dirMap['insert'];
+            console.log("parseDirective");
             if(directiveClass){
-                var directive = directiveClass.createDirByExpress("");
+                var directive = new directiveClass();
+                directive.initWithExpress("");
                 directives.push(directive);
             }
         }
-
+        this.directives = directives;
     },
 
 
-    setScorp:function(scorp){
-        this.scorp = scorp;
+    removeProVdom:function(){
+        this.proVdom = null;
     },
 
-    parseVdom:function(scorp,vDom){
 
+    setScope:function(scope){
+        this.scope = scope;
+    },
+    getScope:function(){
+        return this.scope;
     }
 });
 module.exports = TplTreeNode;

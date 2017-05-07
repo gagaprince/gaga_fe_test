@@ -12,7 +12,7 @@ var DirectiveMapUtil = {
         map[name]=directive;
     },
     getMap:function(){
-        return this.map;
+        return this.directiveMap;
     }
 }
 module.exports = DirectiveMapUtil;
