@@ -16,6 +16,9 @@
                 <div id="sex" class="sex">性别:{{sex}}</div>
                 <div id="mumName" class="mum-name">妈妈名字:{{mum.name}}</div>
                 <div id="mumSex" class="mum-sex">妈妈性别:{{mum.sex}}</div>
+                <div g-for="child in children" class="child">
+                    孩子的名字 {{child.name}}
+                </div>
             </div>
         </div>
     </body>

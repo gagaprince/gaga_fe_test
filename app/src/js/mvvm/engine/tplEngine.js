@@ -88,11 +88,11 @@ var tplEngine = {
     //把attr字符串变成map
     anysisAttrMap:function(attrStr){
         var map = {};
-        var attrArray = attrStr.replace(/\"/g,"").trim().split(/\s+/);
-        var item = attrArray[0];
-        for(var i=0;item;item=attrArray[++i]){
-            var itemArray = item.split("=");
-            map[itemArray[0]] = itemArray[1]||"";
+        attrStr = attrStr.trim();
+        var attrReg = /(.*?)=\"(.*?)\"/gi;
+        var attrMatch = attrReg.exec(attrStr);
+        for(;attrMatch;attrMatch=attrReg.exec(attrStr)){
+            map[attrMatch[1].trim()] = attrMatch[2].trim()||"";
         }
         return map;
     },
@@ -102,32 +102,46 @@ var tplEngine = {
      * @param data
      */
     parseVDom:function(root,data){
-        root.setScope(data);
+        root.setScope(data,true);
         var vDomRoot = new vDomNode('vDomRoot');
         this.createVdomTreeByTpl(vDomRoot,root);
         return vDomRoot
     },
     createVdomTreeByTpl:function(vDomParent,tplNodeParent){
-        var vDom = this.parseVdomByCurrentNode(vDomParent,tplNodeParent);
+        this.tplNodeExcuteDirBefore(vDomParent,tplNodeParent);
         var children = tplNodeParent.getChildren();
         var child = children[0];
         for(var i=0;child;child=children[++i]){
-            child.setScope(tplNodeParent.getScope());
+            var vDom=this.createProVdom();
+            //console.log("createVdomTreeByTpl");
+            //console.log(tplNodeParent.getScope());
+            //console.log(child.getScope());
+            child.setScopeIfNull(tplNodeParent.getScope());
             this.createVdomTreeByTpl(vDom,child);
+            vDomParent.addChild(vDom);
+            child.clearScope();
         }
+        this.tplNodeExcuteDirAfter(vDomParent,tplNodeParent);
     },
-    parseVdomByCurrentNode:function(vDomParent,tplNodeParent){
-        var vDom=this.createProVdom();
-        var dirs = tplNodeParent.directives||[];
+    tplNodeExcuteDirBefore:function(vDom,tplNode){//执行 先序指令
+        var dirs = tplNode.directives||[];
         for(var i=0;i<dirs.length;i++){
             var dir = dirs[i];
             if(dir)
             {
-                dir.excute(tplNodeParent,vDom);
+                dir.excute(tplNode,vDom);
             }
         }
-        vDomParent.addChild(vDom);
-        return vDom;
+    },
+    tplNodeExcuteDirAfter:function(vDom,tplNode){
+        var dirs = tplNode.directives||[];
+        for(var i=0;i<dirs.length;i++){
+            var dir = dirs[i];
+            if(dir)
+            {
+                dir.excuteAfter(tplNode,vDom);
+            }
+        }
     },
     createProVdom:function(){
         return new vDomNode();

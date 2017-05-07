@@ -14,8 +14,14 @@ var vDomNode = TreeNode.extend({
     ctor:function(key){
         this._super(key);
     },
+    getTagName:function(){
+        return this.tagName;
+    },
     setId:function(id){
         this.id = id||"";
+    },
+    setKey:function(key){
+        this.key = key;
     },
     setClassName:function(className){
         this.className = className||"";

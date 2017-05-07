@@ -1,6 +1,7 @@
 "use strict";
 var GVBase = require('./GVBase');
 var tplEngine = require('./engine/tplEngine');
+var diffEngine = require('./engine/DiffEngine');
 
 GVBase.initDirective();
 var GV = GVBase.extend({
@@ -9,13 +10,13 @@ var GV = GVBase.extend({
     $data:null,
     $tplTree:null,
     $vDomTree:null,
-
-    $tpl:null,
+    $currentRenderTree:null,
     _renderlock:null,
 
     ctor:function(options){
         this.$id = options&&options.el;
         this.$data = options&&options.data&&options.data()||{};
+        this.compileData(this.$data);
         //根据id获取模板内容 再根据模板内容分析出模板树
         this.compileTplById();
 
@@ -30,6 +31,7 @@ var GV = GVBase.extend({
         var innerHtml = dom.innerHTML;
         this.compileDomByTemplate(innerHtml);
         this.compileVDomByTplTree();
+        this.render();
     },
     compileDomByTemplate:function(template){
         this.$tplTree = tplEngine.compileTpl(template);//通过模板引擎 分析出模板树
@@ -84,13 +86,28 @@ var GV = GVBase.extend({
         }
         var _this = this;
         this._renderlock = setTimeout(function(){
-            _this.render();
+            _this.reRender();
         });
+    },
+    reRender:function(){
+        this.compileVDomByTplTree();
+        this.render();
     },
     render:function(){
 //        console.log(this.$data);
-        var html = this.$tpl(this.$data);
-        this.$dom.innerHTML = html;
+        var vDomRoot = this.$vDomTree;
+        if(this.$currentRenderTree){
+            //console.log(this.$currentRenderTree);
+            //console.log(vDomRoot);
+            diffEngine.diffTree(this.$currentRenderTree,vDomRoot);
+            //console.log(this.$currentRenderTree);
+            //console.log(vDomRoot);
+        }else{
+            vDomRoot.setDom(this.$dom);
+            this.$dom.innerHTML = '';
+            diffEngine.renderNormalTree(vDomRoot);
+        }
+        this.$currentRenderTree = vDomRoot;
     }
 
 });

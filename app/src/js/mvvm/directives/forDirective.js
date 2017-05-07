@@ -1,30 +1,47 @@
 "use strict";
-var baseDirective = require('./baseDirective');
-var forDirective = baseDirective.extend({
-    excute:function(tplNode,scorp,vDom){
-        var vDomChildren = this.createVdomByTpl(tplNode,scorp);
-        vDom.addChildren(vDomChildren);
-        return vDom;
+var BaseDirective = require('./BaseDirective');
+var ForDirective = BaseDirective.extend({
+    rank:2,
+    tempChildren:null,
+    ctor:function(express){
+        this.express = express;
     },
-    createVdomByTpl:function(tplNode,scorp){
-        var express = tplNode.getExpress();
-        var args = express.split("in");
-        var vDomChildren = [];
-        if(args.length==2){
-            var obj = this.compileObj(args[1].trim(),scorp);
-            for(var key in obj){
-                var value = obj[key];
-                var childScorp = scorp;
-                childScorp[args[0].trim()] = value;
-                var vDomChild = tplNode.parseVdom(childScorp);
-                vDomChildren.push(vDomChild);
-                delete childScorp[args[0].trim()];
-            }
-            return vDomChildren;
-        }else{
-            throw "for express has a error";
+    excute:function(tplNode,vDom){
+        if(tplNode.ignoreFor)return;
+        //console.log("for-excute");
+        var children =this.tempChildren = tplNode.getChildren();
+        tplNode.clearChildren();
+
+
+        var express = this.express;
+        var items = express.split("in");
+        var itemKeyEx = items[0].trim();
+        var itemArrayEx = items[1].trim();
+
+        var scope = tplNode.cloneScope();
+        var itemArray = this.replaceWith(scope,itemArrayEx);
+        for(var key in itemArray){
+            var val = itemArray[key];
+            //console.log(itemKeyEx);
+            //console.log(val);
+            var scope = tplNode.cloneScope();
+            scope[itemKeyEx]=val;
+            //console.log(scope);
+            var cloneTplNode = tplNode.clone();
+            cloneTplNode.setScope(scope);
+            cloneTplNode.addChildren(children);
+            cloneTplNode.ignoreFor = true;
+            tplNode.addChild(cloneTplNode);
         }
-        return null;
+    },
+    excuteAfter:function(tplNode,vDom){
+        if(tplNode.ignoreFor)return;
+        //console.log("for-excute-after");
+        tplNode.clearChildren();
+        tplNode.addChildren(this.tempChildren);
     }
 });
-module.exports = forDirective;
+ForDirective.getName = function(){
+    return "for";
+}
+module.exports = ForDirective;

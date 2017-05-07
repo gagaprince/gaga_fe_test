@@ -33,6 +33,9 @@ var TreeNode = HClass.extend({
             }
         }
     },
+    clearChildren:function(){
+        this.children = [];
+    },
     getChildren:function(){
         return this.children;
     },

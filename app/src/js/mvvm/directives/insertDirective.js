@@ -1,6 +1,7 @@
 "use strict";
 var BaseDirective = require('./BaseDirective');
 var InsertDirective = BaseDirective.extend({
+    rank:3,
     excute:function(tplNode,vDom){
         var inner = tplNode.getInner();
         var inserReg = /{{(.*?)}}/gi;
@@ -8,6 +9,7 @@ var InsertDirective = BaseDirective.extend({
         var inserText = '';
         var lastIndex = 0;
         var scope = tplNode.getScope();
+        //console.log(scope);
         for(;matchArr;matchArr=inserReg.exec(inner)){
             var express = matchArr[1];//取出差值表达式
             var currentIndex = matchArr.index;
@@ -18,7 +20,6 @@ var InsertDirective = BaseDirective.extend({
         }
         var end = inner.substring(lastIndex);
         inserText += end;
-        console.log(inserText);
         //构造出虚拟节点 挂载在vDom上
         vDom.setDomText(inserText);
     }
