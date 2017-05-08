@@ -8,22 +8,45 @@ var GV = GVBase.extend({
     $id:null,
     $dom:null,
     $data:null,
+    $methods:null,
     $tplTree:null,
     $vDomTree:null,
     $currentRenderTree:null,
     _renderlock:null,
+    self:null,
 
     ctor:function(options){
         this.$id = options&&options.el;
         this.$data = options&&options.data&&options.data()||{};
+        this.$methods = options&&options.methods||{}
+        this.addNativeMethods();
+        this.mergeSelf();
         this.compileData(this.$data);
         //根据id获取模板内容 再根据模板内容分析出模板树
         this.compileTplById();
+
 
         /*this.compileDom();
         this.compileData(this.$data);
         this.render();
         tplEngine.compileTpl(this.$id,this.$data);*/
+    },
+    addNativeMethods:function(){
+        var nativeMethod = this.nativeMethods||{};
+        for(var key in nativeMethod){
+            this.$methods[key]=nativeMethod[key];
+        }
+    },
+    mergeSelf:function(){
+        if(!this.self){
+            this.self = {};
+        }
+        for(var key in this.$data){
+            this.self[key] = this.$data[key];
+        }
+        for(var key in this.$methods){
+            this.self[key] = this.$methods[key];
+        }
     },
     compileTplById:function(){
         var id = this.$id;
@@ -39,7 +62,7 @@ var GV = GVBase.extend({
     },
 
     compileVDomByTplTree:function(){
-        this.$vDomTree = tplEngine.parseVDom(this.$tplTree,this.$data);
+        this.$vDomTree = tplEngine.parseVDom(this.$tplTree,this);
         console.log(this.$vDomTree);
     },
 
@@ -108,8 +131,10 @@ var GV = GVBase.extend({
             diffEngine.renderNormalTree(vDomRoot);
         }
         this.$currentRenderTree = vDomRoot;
+    },
+    getSelf:function(){
+        return this.self;
     }
-
 });
 
 

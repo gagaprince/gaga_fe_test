@@ -40,17 +40,17 @@ var TplTreeNode = TreeNode.extend({
         this.addNormalDirectives(directives);
         if(attrMap){
             for(var key in attrMap){
-                var dirReg = /g-(.*)/gi;
+                var dirReg = /g-([^:]{1,}):*([^:]{0,})/gi;
                 var matchArr = dirReg.exec(key);
                 if(matchArr){
                     var dirKey = matchArr[1];
-                    //console.log("g-");
-                    //console.log(matchArr);
-                    //console.log(dirKey);
-                    //console.log(attrMap[key]);
+//                    console.log("g-");
+//                    console.log(matchArr);
+//                    console.log(dirKey);
+//                    console.log(attrMap[key]);
                     var directiveClass = dirMap[dirKey];
                     if(directiveClass){
-                        var directive = new directiveClass(attrMap[key]);
+                        var directive = new directiveClass(attrMap[key],matchArr[2]);
                         directives.push(directive);
                     }
                 }
@@ -72,7 +72,7 @@ var TplTreeNode = TreeNode.extend({
             dirs.sort(function (item1,item2) {
                 //console.log(item1.getRank());
                 //console.log(item2.getRank());
-                return item2.getRank()-item1.getRank();
+                return item1.getRank()-item2.getRank();
             });
             //console.log(dirs);
             return dirs;
@@ -108,7 +108,12 @@ var TplTreeNode = TreeNode.extend({
         return this.scope;
     },
     cloneScope:function(){
-        return this.cloneObj(this.scope);
+        var objCp = {};
+        var obj = this.scope;
+        for(var key in obj){
+            objCp[key]=obj[key];
+        }
+        return objCp;
     },
     cloneObj:function(obj){
         var objCp = {};

@@ -9,7 +9,7 @@ var DiffEngine = {
         var newChild = newChildren[0];
         for(var i=0;newChild;newChild=newChildren[++i]){
             var key = newChild.key;
-            var oldChild = oldChildKeyMap[key].pop();
+            var oldChild = oldChildKeyMap[key]?oldChildKeyMap[key].pop():null;
             if(oldChild){
 //                newChild.addFlag("modify",oldChild);
                 newChild.setDom(oldChild.getDom());
@@ -71,6 +71,7 @@ var DiffEngine = {
         var dom = newNode.getDom();
         this._renderModifyAttr(newNode,oldNode,dom);
         this._renderModifyText(newNode,oldNode,dom);
+        this._bindModifyEvent(newNode,oldNode,dom);
     },
     _renderModifyAttr:function(newNode,oldNode,dom){
         var attrNew = newNode.getAttrMap();
@@ -94,6 +95,29 @@ var DiffEngine = {
             dom.data = newNode.text;
         }
     },
+    _bindModifyEvent:function(newNode,oldNode,dom){
+        var newEvents = newNode.getEventList();
+        var oldEvents = oldNode.getEventList();
+        var hitOlds = [].concat(oldEvents);
+        for(var i=0;i<newEvents.length;i++){
+            var newEvent = newEvents[i];
+            var isNew = true;
+            for(var j=0;j<hitOlds.length;j++){
+                var oldEvent = hitOlds[j];
+                if(newEvent.eventName==oldEvent.eventName && newEvent.callback==oldEvent.callback){
+                    isNew = false;
+                    hitOlds.splice(j,1);
+                    break;
+                }
+            }
+            if(isNew){
+                newNode.bindEvent(newEvent,dom);
+            }
+        }
+        for(var j=0;j<hitOlds.length;j++){
+            oldNode.unbindEvent(oldEvent,dom);
+        }
+    },
     _parseKeyMapFromNodeList:function(children){
         if(children){
             var keyMap = {};
@@ -111,6 +135,7 @@ var DiffEngine = {
         }
         return {};
     },
+
     renderNormalTree:function(vDomNode,domP){
         if(!domP){
             domP = vDomNode.getDom();
@@ -134,6 +159,7 @@ var DiffEngine = {
             domP.appendChild(ele);
             domP = ele;
             vDomNode.setDom(domP);
+            vDomNode.bindEvents();
         }
         if(domP){
             var children = vDomNode.getChildren()||[];

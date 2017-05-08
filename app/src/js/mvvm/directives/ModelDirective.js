@@ -1,0 +1,39 @@
+"use strict";
+var BaseDirective = require('./BaseDirective');
+var ModelDirective = BaseDirective.extend({
+    rank:6,
+    tempChildren:null,
+    ctor:function(express){
+        this.express = express;
+    },
+    excute:function(tplNode,vDom){
+        var tagName = vDom.getTagName();
+//        console.log(tagName);
+        if(tagName=="input"){
+            var type = vDom.getAttrValue("type");
+//            console.log(type);
+            switch (type){
+                case 'text':
+                    this.excuteWhenInputText(tplNode,vDom);
+                    break;
+            }
+        }
+    },
+    excuteWhenInputText:function(tplNode,vDom){
+        var gv = vDom.getTarget();
+        var gvSelf = vDom.getTarget().getSelf();
+        var fun = this.replaceWith(gvSelf,"G_vFormInputTextChange");
+//        console.log(this.express);
+        vDom.addEventLister("input",fun,[this.express]);
+
+        var text = this.replaceWith(gvSelf,this.express);
+        vDom.addAttrMap("value",text);
+    },
+    excuteAfter:function(tplNode,vDom){
+
+    }
+});
+ModelDirective.getName = function(){
+    return "model";
+}
+module.exports = ModelDirective;

@@ -39,6 +39,7 @@ var ForDirective = BaseDirective.extend({
         //console.log("for-excute-after");
         tplNode.clearChildren();
         tplNode.addChildren(this.tempChildren);
+        this.tempChildren = null;
     }
 });
 ForDirective.getName = function(){

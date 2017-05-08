@@ -1,7 +1,7 @@
 "use strict";
 var BaseDirective = require('./BaseDirective');
 var ElementDirective = BaseDirective.extend({
-    rank:1,
+    rank:0,
     excute:function(tplNode,vDom){
         //设置vDom的基础信息
         var attrMap = tplNode.getAttrMap();

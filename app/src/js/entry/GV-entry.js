@@ -1,0 +1,1 @@
+require('../mvvm/GV.js');
