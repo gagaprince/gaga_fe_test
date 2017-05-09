@@ -1,7 +1,8 @@
 "use strict";
+var Globle = require('../../base/Globle');
 var BaseDirective = require('./BaseDirective');
 var ForDirective = BaseDirective.extend({
-    rank:2,
+    rank:Globle.DirectiveRank.ForDirRank,
     tempChildren:null,
     ctor:function(express){
         this.express = express;

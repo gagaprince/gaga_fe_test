@@ -9,6 +9,7 @@ var allNullTag = '\s*(img|input|area|base|br)\s*'
 
 var tplEngine = {
     compileTpl:function(template){
+        //将html生成模板树
         return this.parseHtmlToTplTreeNode(template);
     },
     parseHtmlToTplTreeNode:function(template){
@@ -17,15 +18,17 @@ var tplEngine = {
         return root;
     },
     treeCompile:function(template,node){
+        //分析html结构 使用正则表达式匹配 标签，判断是空标签 头标签 和 尾标签 从而做不同的操作
+        //匹配所有html结构
         var htmlTagReg = /<(\s*\/*([a-z]{1,})(\s+(.*?)=\s*\"(.*?)\"){0,}|\s*)>/gi; //匹配标签的html
-        var beginTagInfos = [];       //其实标签栈 用来记录当前未闭合的标签
-        var lastTagMatchArr = null;
-        var tagMatchArr = htmlTagReg.exec(template);
+        //var beginTagInfos = [];       //其实标签栈 用来记录当前未闭合的标签
+        var lastTagMatchIndex = null;     //上次匹配的尾节点下标
+        var tagMatchArr = htmlTagReg.exec(template);//匹配字符模板
 //        console.log(tagMatchArr);
-        var currentNode = node;
-        for(;tagMatchArr;tagMatchArr=htmlTagReg.exec(template)){
-            if(lastTagMatchArr){//如果存在上一次标签的匹配结果 则检查当前匹配开始下标与上次结尾之间的文字，建立一个文字节点
-                var laseIndex = lastTagMatchArr.lastIndex;
+        var currentNode = node; //当前模板节点指向传入节点 （根节点）
+        for(;tagMatchArr;tagMatchArr=htmlTagReg.exec(template)){//循环匹配标签
+            if(lastTagMatchIndex){//如果存在上一次标签的匹配结果 则检查当前匹配开始下标与上次结尾之间的文字，建立一个文字节点
+                var laseIndex = lastTagMatchIndex;
                 var currentIndex = tagMatchArr.index;
                 var inHtml = template.substring(laseIndex,currentIndex).trim();
                 if(inHtml!=""){
@@ -34,6 +37,7 @@ var tplEngine = {
                 }
             }
             var tagHtml = tagMatchArr[0];
+            //头标签的匹配串
             var beginTagReg = /<\s*([a-z]{1,})\s+(((.*?)=\s*\"(.*?)\"){0,}\s*)>|<\s*([a-z]{1,})(\s*)>/gi; //有attr 和 没有attr两种
 //            console.log(tagHtml);
             var beginMatchArr = beginTagReg.exec(tagHtml);
@@ -52,21 +56,26 @@ var tplEngine = {
                 currentNode.addChild(node);
                 if(beginRealArr[1].match(new RegExp(allNullTag,"gi"))){//枚举所有空标签
                     //是一个空标签 比如 img
+                    //空标签没有尾标签 所以不需要将当前node移项
                 }else{
                     currentNode = node;
-                    beginTagInfos.push(tagMatchArr);
                 }
             }else{
+                //如果是尾标签 则将当前节点上移
                 var endTagReg = /<\s*\/(.*?)>/gi;
                 var endArr = endTagReg.exec(tagHtml);
                 if(endArr){
                     currentNode = currentNode.getParent();
                 }
             }
-            lastTagMatchArr = tagMatchArr;
-            lastTagMatchArr.lastIndex = htmlTagReg.lastIndex;
+            lastTagMatchIndex = htmlTagReg.lastIndex; //移动lastTagMatchIndex
         }
     },
+    /**
+     * 创造一个文字节点
+     * @param inHtml 文字内容
+     * @returns {*}
+     */
     createTplTreeNodeByText:function(inHtml){
         if(inHtml){
             var textNode = new TplTreeNode();
@@ -77,6 +86,11 @@ var tplEngine = {
         }
         return null;
     },
+    /**
+     * 创造一个一般的虚拟节点标签
+     * @param matchArr
+     * @returns {*}
+     */
     createTplTreeNodeByArr:function(matchArr){
         if(matchArr){
             var tplNode = new TplTreeNode();

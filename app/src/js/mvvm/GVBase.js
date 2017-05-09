@@ -43,7 +43,7 @@ GVBase.initDirective = function(){
     DirectiveMapUtil.register(ModelDirective);
     DirectiveMapUtil.register(OnDirective);
 }
-GVBase.addDirective = function(){
-
+GVBase.addDirective = function(dir){
+    DirectiveMapUtil.register(dir);
 }
 module.exports = GVBase;

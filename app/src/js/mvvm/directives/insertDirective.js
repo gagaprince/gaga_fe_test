@@ -1,7 +1,8 @@
 "use strict";
+var Globle = require('../../base/Globle');
 var BaseDirective = require('./BaseDirective');
 var InsertDirective = BaseDirective.extend({
-    rank:3,
+    rank:Globle.DirectiveRank.InsertDirRank,
     excute:function(tplNode,vDom){
         var inner = tplNode.getInner();
         var inserReg = /{{(.*?)}}/gi;

@@ -1,7 +1,8 @@
 "use strict";
+var Globle = require('../../base/Globle');
 var BaseDirective = require('./BaseDirective');
 var OnDirective = BaseDirective.extend({
-    rank:7,
+    rank:Globle.DirectiveRank.OnDirRank,
     tempChildren:null,
     attrKey:null,
     ctor:function(express,key){

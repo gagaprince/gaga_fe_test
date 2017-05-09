@@ -1,7 +1,8 @@
 "use strict";
+var Globle = require('../../base/Globle');
 var BaseDirective = require('./BaseDirective');
 var ElementDirective = BaseDirective.extend({
-    rank:0,
+    rank:Globle.DirectiveRank.ElementDirRank,
     excute:function(tplNode,vDom){
         //设置vDom的基础信息
         var attrMap = tplNode.getAttrMap();
