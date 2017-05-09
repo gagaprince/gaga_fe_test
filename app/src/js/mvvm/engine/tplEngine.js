@@ -98,7 +98,7 @@ var tplEngine = {
             var attrMap = this.anysisAttrMap(matchArr[2]);
             tplNode.setTagName(tagName);
             tplNode.setAttrMap(attrMap);
-            tplNode.parseDirective();
+            tplNode.parseDirective();//解析指令
             return tplNode;
         }
         return null;
@@ -120,6 +120,7 @@ var tplEngine = {
      * @param data
      */
     parseVDom:function(root,gv){
+        //初始化vdom根节点 传入scope
         var data = gv.$data;
         root.setScope(data,true);
         var vDomRoot = new vDomNode('vDomRoot');
@@ -127,8 +128,9 @@ var tplEngine = {
         this.createVdomTreeByTpl(vDomRoot,root);
         return vDomRoot
     },
+    //通过模板tree 生成 虚拟dom tree
     createVdomTreeByTpl:function(vDomParent,tplNodeParent){
-        this.tplNodeExcuteDirBefore(vDomParent,tplNodeParent);
+        this.tplNodeExcuteDirBefore(vDomParent,tplNodeParent);//广度遍历前执行指令
         var children = tplNodeParent.getChildren();
         var child = children[0];
         for(var i=0;child;child=children[++i]){
@@ -136,12 +138,12 @@ var tplEngine = {
             //console.log("createVdomTreeByTpl");
             //console.log(tplNodeParent.getScope());
             //console.log(child.getScope());
-            child.setScopeIfNull(tplNodeParent.getScope());
-            this.createVdomTreeByTpl(vDom,child);
-            vDomParent.addChild(vDom);
-            child.clearScope();
+            child.setScopeIfNull(tplNodeParent.getScope());//设置子节点 scope 如果子节点 通过指令形式设置了scope 则放弃
+            this.createVdomTreeByTpl(vDom,child);   //建立子节点
+            vDomParent.addChild(vDom);              //将子节点加入父级节点
+            child.clearScope(); //清除子节点 scope
         }
-        this.tplNodeExcuteDirAfter(vDomParent,tplNodeParent);
+        this.tplNodeExcuteDirAfter(vDomParent,tplNodeParent);//广度遍历后 执行指令
     },
     tplNodeExcuteDirBefore:function(vDom,tplNode){//执行 先序指令
         var dirs = tplNode.directives||[];
@@ -154,7 +156,7 @@ var tplEngine = {
             }
         }
     },
-    tplNodeExcuteDirAfter:function(vDom,tplNode){
+    tplNodeExcuteDirAfter:function(vDom,tplNode){//执行后续指令
         var dirs = tplNode.directives||[];
         for(var i=0;i<dirs.length;i++){
             var dir = dirs[i];

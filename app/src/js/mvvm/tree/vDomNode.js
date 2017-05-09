@@ -9,11 +9,9 @@ var vDomNode = TreeNode.extend({
     value:'',
     text:'',
     diffFlag:"",
-    diffNode:null,
     realDom:null,
-
     gvTarget:null,//gv对象的指针
-    eventList:null,
+    eventList:null,//当前节点绑定的事件列表
 
     ctor:function(key){
         this._super(key);
@@ -51,13 +49,11 @@ var vDomNode = TreeNode.extend({
     getDiffNode:function(){
         return this.diffNode;
     },
-    addFlag:function(flag,oldNode){
+    addFlag:function(flag){
         this.diffFlag = flag;
-        this.diffNode = oldNode;
     },
     resetFlag:function(){
         this.diffFlag = "";
-        this.diffNode = null;
     },
     setDom:function(dom){
         //和自己当前节点相匹配的真实dom节点
@@ -135,6 +131,12 @@ var vDomNode = TreeNode.extend({
     },
     getTarget:function(){
         return this.gvTarget;
+    },
+    getValue:function(){
+        return this.value;
+    },
+    setValue:function(val){
+        this.value = val;
     }
 });
 module.exports = vDomNode;

@@ -6,6 +6,7 @@ var TreeNode = HClass.extend({
     children:null,
     parent:null,
     domText:null,
+    text:null,
     ctor:function(key){
         this.key = key||"";
         this.children = [];

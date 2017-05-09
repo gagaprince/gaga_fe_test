@@ -28,7 +28,11 @@ var ModelDirective = BaseDirective.extend({
         vDom.addEventLister("input",fun,[this.express]);
 
         var text = this.replaceWith(gvSelf,this.express);
-        vDom.addAttrMap("value",text);
+//        console.log("excuteWhenInputText");
+//        console.log(text);
+//        console.log("excuteWhenInputText end");
+        vDom.setValue(text);
+//        vDom.addAttrMap("value",text);
     },
     excuteAfter:function(tplNode,vDom){
 
