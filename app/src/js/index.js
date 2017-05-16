@@ -35,10 +35,10 @@ var user = {
     "name":"gaga",
     "sex":1
 };
-
+/*
 Object.observe(user, function(changes){
     changes.forEach(function(change) {
         var fullName = user.name+" "+user.sex;
         console.log(fullName);
     });
-});
+});*/

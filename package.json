@@ -12,6 +12,9 @@
     "gulp": "^3.9.1"
   },
   "devDependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-es2015": "^6.24.1",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-bower": "^0.0.13",
